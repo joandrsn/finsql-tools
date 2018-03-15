@@ -1,0 +1,3 @@
+[submodule "src/powershell/navdevenv"]
+	path = src/powershell/navdevenv
+	url = https://github.com/joandrsn/navdevenv.git
