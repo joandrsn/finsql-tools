@@ -11,23 +11,96 @@
         "Other"
     ],
     "activationEvents": [
-        "onCommand:extension.sayHello"
+        "*"
     ],
     "main": "./out/extension",
     "contributes": {
         "commands": [
             {
                 "command": "extension.sayHello",
-                "title": "Hello World"
+                "title": "Hello World",
+                "category": "Dynamics NAV SCM"
+            },
+            {
+                "command": "dynamicsnavscm.relaunchterminal",
+                "title": "Relaunch terminal",
+                "category": "Dynamics NAV SCM"
+            },
+            {
+                "command": "dynamicsnavscm.startide",
+                "title": "Start NAV Development Enviroment",
+                "category": "Dynamics NAV SCM"
+            },
+            {
+                "command": "dynamicsnavscm.exportfromnav",
+                "title": "Export objects from NAV",
+                "category": "Dynamics NAV SCM"
+            },
+            {
+                "command": "dynamicsnavscm.importtonav",
+                "title": "Import objects to NAV",
+                "category": "Dynamics NAV SCM"
+            },
+            {
+                "command": "dynamicsnavscm.generategitattributes",
+                "title": "Generate gitattributes-file",
+                "category": "Dynamics NAV SCM"
+            }
+        ],
+        "configuration": [
+            {
+                "type": "object",
+                "title": "Dynamics NAV configuration",
+                "properties": {
+                    "dynamicsnavscm.rtcpath": {
+                        "type": "string",
+                        "default": "",
+                        "description": "stuff"
+                    },
+                    "dynamicsnavscm.nstpath": {
+                        "type": "string",
+                        "default": ""
+                    },
+                    "dynamicsnavscm.databasename": {
+                        "type": "string",
+                        "default": ""
+                    },
+                    "dynamicsnavscm.databaseserver": {
+                        "type": "string",
+                        "default": "localhost"
+                    },
+                    "dynamicsnavscm.compileafterimport": {
+                        "type": "boolean",
+                        "default": true
+                    },
+                    "dynamicsnavscm.exportunlicensedasbinary": {
+                        "type": "boolean",
+                        "default": true
+                    },
+                    "dynamicsnavscm.exportfilters": {
+                        "type": "array"
+                    },
+                    "dynamicsnavscm.uidoffset": {
+                        "type": "integer",
+                        "default": 50000
+                    },
+                    "dynamicsnavscm.datemodification": {
+                        "type": "boolean",
+                        "default": true
+                    }
+
+                }
             }
         ]
     },
     "scripts": {
         "vscode:prepublish": "npm run compile",
-        "compile": "tsc -p ./",
-        "watch": "tsc -watch -p ./",
+        "compile": "npm run powershell && tsc -p ./",
+        "watch": "npm run powershell && tsc -watch -p ./",
         "postinstall": "node ./node_modules/vscode/bin/install",
-        "test": "npm run compile && node ./node_modules/vscode/bin/test"
+        "test": "npm run compile && node ./node_modules/vscode/bin/test",
+        "powershell": "powershell -noprofile -file ./psscripts/copyps.ps1",
+        "updatepsmodules": "powershell -noprofile -file ./psscripts/update_modules.ps1"
     },
     "devDependencies": {
         "typescript": "^2.6.1",

@@ -1,17 +1,19 @@
 import { window, Terminal } from 'vscode';
 
-let terminal: Terminal = null;
+export class TerminalRunner {
 
-export function getTerminal(terminalName: string) {
-    if (terminal === null) {
-        
-        terminal = window.createTerminal('hello world');
+    private static instance: Terminal = null;
+    
+    static getTerminal(terminalName: string) {
+        if (TerminalRunner.instance === null) {
+            TerminalRunner.instance = window.createTerminal(terminalName);
+        }
+        return TerminalRunner.instance;
     }
-    return terminal;
-}
 
-export function showTerminal() {
-    if(terminal === null) 
-        return
-    terminal.show();
+    static showTerminal() {
+        if (TerminalRunner.instance === null) 
+            return
+        TerminalRunner.instance.show();
+    }
 }

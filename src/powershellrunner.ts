@@ -1,18 +1,24 @@
-import { PowerShell } from "./powershell";
-import * as TerminalRunner from "./terminal";
-import { Terminal } from "vscode";
+import { PowerShellCommand, PowerShellVariable } from "./powershell";
+import { window, Terminal } from "vscode";
 
+const terminalIdentifier = 'Dynamics NAV Shell';
+let terminal: Terminal = window.createTerminal(terminalIdentifier);
 
 export function RunPowershellCommand(command: string, parameters: object) {
-    let t: Terminal = TerminalRunner.getTerminal('hello-world');
-    let powershell: PowerShell = new PowerShell(command, parameters);
-    t.sendText(powershell.GetExecutionCommand());
+    let powershell: PowerShellCommand = new PowerShellCommand(command, parameters);
+    terminal.sendText(powershell.GetExecutionCommand());
 }
 
+export function DefinePowershellVariable(variablename: string, value: any) {
+    let powershellVariable: PowerShellVariable = new PowerShellVariable(variablename, value);
+    terminal.sendText(powershellVariable.GetVariableDefinition());
+}
 
-export function RunMultipleCommands(commands: object[]) {
-    let t: Terminal = TerminalRunner.getTerminal('hello-world');
-    //StartProcessindicator
-    for(let command in commands) {
-    }
+export function ShowTerminal() {
+    terminal.show();
+}
+
+export function RelaunchTerminal() {
+    terminal.dispose();
+    terminal = window.createTerminal(terminalIdentifier);
 }
