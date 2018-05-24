@@ -12,8 +12,8 @@ function stringifyParameter(input: any): string {
         let inputstring: string = input;
         if (inputstring[0] === '$')
             return `${inputstring}`
-        inputstring = inputstring.replace('"', '`"');
-        return `"${inputstring}"`
+        //inputstring = inputstring.replace('"', '`"');
+        return `'${inputstring}'`
     }
     throw `Unsupported type '${input}'.`
 }
@@ -31,14 +31,17 @@ export class PowerShellCommand {
         let settingsArray: string[] = [];
         for (let key in this.parameters) {
             let value = this.parameters[key];
-            let parameterstring = value === null ? `-${key}` : `-${key} ${stringifyParameter(value)}`
+            let parameterstring = value === undefined ? `-${key}` : `-${key} ${stringifyParameter(value)}`
             settingsArray.push(parameterstring);
         }
         return settingsArray.join(' ');
     }
 
-    public GetExecutionCommand(): string {
-        return `${this.command} ${this.stringifyParameters()}`;
+    public GetExecutionCommand(variablename?: string): string {
+        let commandstring = `${this.command} ${this.stringifyParameters()}`
+        if (variablename === undefined)
+            return commandstring
+        return `$${variablename} = ${commandstring}`;
     }
 }
 

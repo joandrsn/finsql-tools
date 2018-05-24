@@ -14,8 +14,10 @@ export function activate(context: ExtensionContext) {
 
     subs.push(commands.registerCommand('extension.sayHello', action.sayHello));
     subs.push(commands.registerCommand('dynamicsnavscm.relaunchterminal', action.relaunchTerminal));
-    subs.push(commands.registerCommand('dynamicsnavscm.generategitattributes', action.generateGitAttributesFile));
+    subs.push(commands.registerCommand('dynamicsnavscm.generateNAVFolderStructure', action.generateNAVFolderStructure));
     subs.push(commands.registerCommand('dynamicsnavscm.exportfromnav', action.exportSplitObjects))
+    subs.push(commands.registerCommand('dynamicsnavscm.importtonav', action.ImportObjects));
+    subs.push(commands.registerCommand('dynamicsnavscm.startIDE', action.startNAVIDE));
 
     /* let disposable = vscode.commands.registerCommand('extension.sayHello', () => {
    

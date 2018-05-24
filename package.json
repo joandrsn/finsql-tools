@@ -42,8 +42,13 @@
                 "category": "Dynamics NAV SCM"
             },
             {
-                "command": "dynamicsnavscm.generategitattributes",
-                "title": "Generate gitattributes-file",
+                "command": "dynamicsnavscm.generateNAVFolderStructure",
+                "title": "Generate .gitattributes, .gitignore, temp- and src-folder",
+                "category": "Dynamics NAV SCM"
+            },
+            {
+                "command": "dynamicsnavscm.startIDE",
+                "title": "Start IDE",
                 "category": "Dynamics NAV SCM"
             }
         ],
@@ -55,11 +60,11 @@
                     "dynamicsnavscm.rtcpath": {
                         "type": "string",
                         "default": "",
-                        "description": "stuff"
+                        "description": "Installation path to the RoleTailored Client (Folder)"
                     },
                     "dynamicsnavscm.nstpath": {
                         "type": "string",
-                        "default": ""
+                        "description": "Installation path to the ServiceTier (Folder)"
                     },
                     "dynamicsnavscm.databasename": {
                         "type": "string",
@@ -69,24 +74,36 @@
                         "type": "string",
                         "default": "localhost"
                     },
-                    "dynamicsnavscm.compileafterimport": {
+                    "dynamicsnavscm.import.compileafter": {
                         "type": "boolean",
                         "default": true
                     },
-                    "dynamicsnavscm.exportunlicensedasbinary": {
+                    "dynamicsnavscm.export.unlicensedasbinary": {
                         "type": "boolean",
                         "default": true
                     },
-                    "dynamicsnavscm.exportfilters": {
-                        "type": "array"
+                    "dynamicsnavscm.export.filters": {
+                        "type": "array",
+                        "description": "Export once for each of these filters. Filters found at https://docs.microsoft.com/en-us/dynamics-nav/exportobjects. A filter like ['Modified=1','Type=Table;ID=18'] would export modifed objects first, then the customer table"
                     },
                     "dynamicsnavscm.uidoffset": {
                         "type": "integer",
                         "default": 50000
                     },
-                    "dynamicsnavscm.datemodification": {
+                    "dynamicsnavscm.export.resetdate": {
                         "type": "boolean",
-                        "default": true
+                        "default": true,
+                        "description": "When exporting, copy the datetime value from the original object (if exists) and apply it to the current object."
+                    },
+                    "dynamicsnavscm.export.resetmodified": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "When exporting, copy the modified value from the original object (if exists) and apply it to the current object."
+                    },
+                    "dynamicsnavscm.focusterminalonaction": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "Show the terminal before executing a command."
                     }
 
                 }

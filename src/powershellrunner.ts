@@ -4,9 +4,9 @@ import { window, Terminal } from "vscode";
 const terminalIdentifier = 'Dynamics NAV Shell';
 let terminal: Terminal = window.createTerminal(terminalIdentifier);
 
-export function RunPowershellCommand(command: string, parameters: object) {
+export function RunPowershellCommand(command: string, parameters: object, variablename?: string) {
     let powershell: PowerShellCommand = new PowerShellCommand(command, parameters);
-    terminal.sendText(powershell.GetExecutionCommand());
+    terminal.sendText(powershell.GetExecutionCommand(variablename));
 }
 
 export function DefinePowershellVariable(variablename: string, value: any) {
@@ -21,4 +21,8 @@ export function ShowTerminal() {
 export function RelaunchTerminal() {
     terminal.dispose();
     terminal = window.createTerminal(terminalIdentifier);
+}
+
+export function RunRawPowershellCommand(command: string) {
+    terminal.sendText(command);
 }
