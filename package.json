@@ -17,11 +17,6 @@
     "contributes": {
         "commands": [
             {
-                "command": "extension.sayHello",
-                "title": "Hello World",
-                "category": "Dynamics NAV SCM"
-            },
-            {
                 "command": "dynamicsnavscm.relaunchterminal",
                 "title": "Relaunch terminal",
                 "category": "Dynamics NAV SCM"
