@@ -1,7 +1,7 @@
 import { PowerShellCommand, PowerShellVariable } from "./powershell";
 import { window, Terminal } from "vscode";
 
-const terminalIdentifier = 'Dynamics NAV Shell';
+const terminalIdentifier = 'Finsql tools Shell';
 let terminal: Terminal = window.createTerminal(terminalIdentifier);
 
 export function RunPowershellCommand(command: string, parameters: object, variablename?: string) {

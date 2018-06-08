@@ -4,17 +4,20 @@ import { join } from 'path';
 import { existsSync, exists, writeFile, mkdirSync, mkdir } from 'fs';
 
 export function initialize() {
-  let config = workspace.getConfiguration('dynamicsnavscm');
+  let config = workspace.getConfiguration('finsqltools');
   let rtcpath: string = config.get('rtcpath');
   let nstpath: string = config.get('nstpath');
   let databasename = config.get('databasename');
   let databaseserver = config.get('databaseserver');
+  let silentprogresspreference = config.get('silentprogresspreference');
 
   DefinePowershellVariable('RTCPath', rtcpath);
   DefinePowershellVariable('NAVIde', join(rtcpath, 'finsql.exe'));
   DefinePowershellVariable('NSTPath', nstpath);
   DefinePowershellVariable('Database', databasename);
   DefinePowershellVariable('Databaseserver', databaseserver);
+  if(silentprogresspreference)
+    DefinePowershellVariable('ProgressPreference', "SilentlyContinue");
   let modulesImportList = getInstallPathModules(rtcpath, nstpath);
   modulesImportList.forEach(element => {
     RunPowershellCommand('Import-Module', { "Name": element, "DisableNameChecking": undefined });
@@ -48,7 +51,7 @@ function testModulePath(rtcPath: string, nstPath: string, file: string): string 
 
 
 export function sayHello() {
-  let config = workspace.getConfiguration('dynamicsnavscm');
+  let config = workspace.getConfiguration('finsqltools');
   let value = config.get('nstpath');
   console.log(typeof value, value.constructor.name, value);
 }
@@ -61,7 +64,7 @@ export function relaunchTerminal() {
 
 
 function getNAVExportFilter(): object[] {
-  let config = workspace.getConfiguration('dynamicsnavscm');
+  let config = workspace.getConfiguration('finsqltools');
   let filters: string[] = config.get('export.filters');
   let launchConfigs: object[] = [];
 
@@ -76,7 +79,7 @@ function getNAVExportFilter(): object[] {
 }
 
 function focusTerminal() {
-  let config = workspace.getConfiguration('dynamicsnavscm');
+  let config = workspace.getConfiguration('finsqltools');
   if (!config.get('focusterminalonaction'))
     return
   ShowTerminal();
@@ -118,7 +121,7 @@ export function exportSplitObjects() {
 }
 
 function copyNAVObjectProperties(splitLocation: string) {
-  let config = workspace.getConfiguration('dynamicsnavscm');
+  let config = workspace.getConfiguration('finsqltools');
   let resetDate: boolean = config.get('export.resetdate');
   let resetModified: boolean = config.get('export.resetmodified');
   if (!(resetDate || resetModified))
@@ -155,7 +158,7 @@ function copyNAVObjectProperties(splitLocation: string) {
 
 function importObjects(from: string, to: string) {
   focusTerminal();
-  let config = workspace.getConfiguration('dynamicsnavscm');
+  let config = workspace.getConfiguration('finsqltools');
   let compileafter: boolean = config.get('import.compileafter');
   RunPowershellCommand("Invoke-Expression", { "Command": `git diff ${from}..${to} --name-only --diff-filter d src/` }, "ImportFiles")
   let importfile = "temp/import.txt";
@@ -243,16 +246,17 @@ function generateGitIgnoreFile() {
   let gitignoreLocation = join(workdir, '.gitignore');
   if (existsSync(gitignoreLocation))
     return
-  let gitignoreContent = 'temp';
+  let gitignoreContent = 'temp\n.vscode';
   writeFile(gitignoreLocation, gitignoreContent, error => {
-    console.log("Error writing to .gitattributes.");
+    if(error)
+      console.log("Error writing to .gitattributes.");
     RunPowershellCommand("Write-Host", { "Object": `Generated new .gitignore file (${gitignoreLocation})` })
   });
 }
 
 export function startNAVIDE() {
   focusTerminal();
-  let config = workspace.getConfiguration('dynamicsnavscm');
+  let config = workspace.getConfiguration('finsqltools');
   let value = config.get('nstpath');
   let databaseServer = config.get('databaseserver')
   let database = config.get('databasename');

@@ -1,6 +1,6 @@
 {
-    "name": "dynamics-nav-scm",
-    "displayName": "dynamics-nav-scm",
+    "name": "finsql-tools",
+    "displayName": "Finsql tools",
     "description": "",
     "version": "0.0.1",
     "publisher": "Spuc",
@@ -17,34 +17,34 @@
     "contributes": {
         "commands": [
             {
-                "command": "dynamicsnavscm.relaunchterminal",
+                "command": "finsqltools.relaunchterminal",
                 "title": "Relaunch terminal",
-                "category": "Dynamics NAV SCM"
+                "category": "Finsql tools"
             },
             {
-                "command": "dynamicsnavscm.startide",
+                "command": "finsqltools.startide",
                 "title": "Start NAV Development Enviroment",
-                "category": "Dynamics NAV SCM"
+                "category": "Finsql tools"
             },
             {
-                "command": "dynamicsnavscm.exportfromnav",
+                "command": "finsqltools.exportfromnav",
                 "title": "Export objects from NAV",
-                "category": "Dynamics NAV SCM"
+                "category": "Finsql tools"
             },
             {
-                "command": "dynamicsnavscm.importtonav",
+                "command": "finsqltools.importtonav",
                 "title": "Import objects to NAV",
-                "category": "Dynamics NAV SCM"
+                "category": "Finsql tools"
             },
             {
-                "command": "dynamicsnavscm.generateNAVFolderStructure",
+                "command": "finsqltools.generateNAVFolderStructure",
                 "title": "Generate .gitattributes, .gitignore, temp- and src-folder",
-                "category": "Dynamics NAV SCM"
+                "category": "Finsql tools"
             },
             {
-                "command": "dynamicsnavscm.startIDE",
+                "command": "finsqltools.startIDE",
                 "title": "Start IDE",
-                "category": "Dynamics NAV SCM"
+                "category": "Finsql tools"
             }
         ],
         "configuration": [
@@ -52,50 +52,55 @@
                 "type": "object",
                 "title": "Dynamics NAV configuration",
                 "properties": {
-                    "dynamicsnavscm.rtcpath": {
+                    "finsqltools.rtcpath": {
                         "type": "string",
                         "default": "",
                         "description": "Installation path to the RoleTailored Client (Folder)"
                     },
-                    "dynamicsnavscm.nstpath": {
+                    "finsqltools.nstpath": {
                         "type": "string",
                         "description": "Installation path to the ServiceTier (Folder)"
                     },
-                    "dynamicsnavscm.databasename": {
+                    "finsqltools.databasename": {
                         "type": "string",
                         "default": ""
                     },
-                    "dynamicsnavscm.databaseserver": {
+                    "finsqltools.databaseserver": {
                         "type": "string",
                         "default": "localhost"
                     },
-                    "dynamicsnavscm.import.compileafter": {
+                    "finsqltools.import.compileafter": {
                         "type": "boolean",
                         "default": true
                     },
-                    "dynamicsnavscm.export.unlicensedasbinary": {
+                    "finsqltools.export.unlicensedasbinary": {
                         "type": "boolean",
                         "default": true
                     },
-                    "dynamicsnavscm.export.filters": {
+                    "finsqltools.silentprogresspreference": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "Sets the progresspreference in PowerShell to SilentlyContinue to make execution faster."
+                    },
+                    "finsqltools.export.filters": {
                         "type": "array",
                         "description": "Export once for each of these filters. Filters found at https://docs.microsoft.com/en-us/dynamics-nav/exportobjects. A filter like ['Modified=1','Type=Table;ID=18'] would export modifed objects first, then the customer table"
                     },
-                    "dynamicsnavscm.uidoffset": {
+                    "finsqltools.uidoffset": {
                         "type": "integer",
                         "default": 50000
                     },
-                    "dynamicsnavscm.export.resetdate": {
+                    "finsqltools.export.resetdate": {
                         "type": "boolean",
                         "default": true,
                         "description": "When exporting, copy the datetime value from the original object (if exists) and apply it to the current object."
                     },
-                    "dynamicsnavscm.export.resetmodified": {
+                    "finsqltools.export.resetmodified": {
                         "type": "boolean",
                         "default": true,
                         "description": "When exporting, copy the modified value from the original object (if exists) and apply it to the current object."
                     },
-                    "dynamicsnavscm.focusterminalonaction": {
+                    "finsqltools.focusterminalonaction": {
                         "type": "boolean",
                         "default": true,
                         "description": "Show the terminal before executing a command."
