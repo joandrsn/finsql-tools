@@ -2,7 +2,7 @@
     "name": "finsql-tools",
     "displayName": "Finsql tools",
     "description": "",
-    "version": "0.0.1",
+    "version": "0.1.0",
     "publisher": "jonasandersen",
     "engines": {
         "vscode": "^1.19.0"
@@ -100,7 +100,6 @@
                         "default": true,
                         "description": "Show the terminal before executing a command."
                     }
-
                 }
             }
         ]
