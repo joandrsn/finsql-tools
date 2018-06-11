@@ -3,7 +3,7 @@
     "displayName": "Finsql tools",
     "description": "",
     "version": "0.0.1",
-    "publisher": "Spuc",
+    "publisher": "jonasandersen",
     "engines": {
         "vscode": "^1.19.0"
     },
@@ -19,11 +19,6 @@
             {
                 "command": "finsqltools.relaunchterminal",
                 "title": "Relaunch terminal",
-                "category": "Finsql tools"
-            },
-            {
-                "command": "finsqltools.startide",
-                "title": "Start NAV Development Enviroment",
                 "category": "Finsql tools"
             },
             {
