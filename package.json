@@ -2,7 +2,7 @@
     "name": "finsql-tools",
     "displayName": "Finsql tools",
     "description": "",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "publisher": "jonasandersen",
     "engines": {
         "vscode": "^1.16.0"
