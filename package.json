@@ -5,7 +5,7 @@
     "version": "0.1.0",
     "publisher": "jonasandersen",
     "engines": {
-        "vscode": "^1.19.0"
+        "vscode": "^1.16.0"
     },
     "categories": [
         "Other"
@@ -22,8 +22,13 @@
                 "category": "Finsql tools"
             },
             {
-                "command": "finsqltools.exportfromnav",
-                "title": "Export objects from NAV",
+                "command": "finsqltools.exportallfromnav",
+                "title": "Export objects from NAV (filters)",
+                "category": "Finsql tools"
+            },
+            {
+                "command": "finsqltools.exportfiltersfromnav",
+                "title": "Export all objects from NAV",
                 "category": "Finsql tools"
             },
             {

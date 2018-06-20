@@ -9,7 +9,8 @@ export function activate(context: ExtensionContext) {
 
     subs.push(commands.registerCommand('finsqltools.relaunchterminal', action.relaunchTerminal));
     subs.push(commands.registerCommand('finsqltools.generateNAVFolderStructure', action.generateNAVFolderStructure));
-    subs.push(commands.registerCommand('finsqltools.exportfromnav', action.exportSplitObjects))
+    subs.push(commands.registerCommand('finsqltools.exportallfromnav', action.exportAllFromNAV));
+    subs.push(commands.registerCommand('finsqltools.exportfiltersfromnav', action.exportFiltersFromNAV));
     subs.push(commands.registerCommand('finsqltools.importtonav', action.ImportObjects));
     subs.push(commands.registerCommand('finsqltools.startIDE', action.startNAVIDE));
 }

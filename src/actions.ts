@@ -1,7 +1,7 @@
 import { DefinePowershellVariable, RunPowershellCommand, ShowTerminal, RelaunchTerminal, RunRawPowershellCommand } from "./powershellrunner";
-import { workspace, env, WorkspaceFolder, window, InputBoxOptions } from 'vscode';
+import { workspace, WorkspaceFolder, window, InputBoxOptions } from 'vscode';
 import { join } from 'path';
-import { existsSync, exists, writeFile, mkdirSync, mkdir } from 'fs';
+import { existsSync, writeFile, mkdirSync} from 'fs';
 
 export function initialize() {
   let config = workspace.getConfiguration('finsqltools');
@@ -49,33 +49,31 @@ function testModulePath(rtcPath: string, nstPath: string, file: string): string 
   return undefined;
 }
 
-
-export function sayHello() {
-  let config = workspace.getConfiguration('finsqltools');
-  let value = config.get('nstpath');
-  console.log(typeof value, value.constructor.name, value);
-}
-
 export function relaunchTerminal() {
   RelaunchTerminal();
   initialize();
   ShowTerminal();
 }
 
+export function exportFiltersFromNAV() {
+  let launchConfigs: object[] = [];
+  launchConfigs.push({ "Filter": undefined });
+  exportSplitObjects(launchConfigs);
+}
 
-function getNAVExportFilter(): object[] {
+export function exportAllFromNAV() {
   let config = workspace.getConfiguration('finsqltools');
   let filters: string[] = config.get('export.filters');
-  let launchConfigs: object[] = [];
-
   if (filters.length === 0) {
-    launchConfigs.push({ "Filter": undefined });
-  } else {
-    filters.forEach(element => {
-      launchConfigs.push({ "Filter": element });
-    });
+    window.showErrorMessage('There are no filters set up in settings. Please add filters in "finsqltools.export.filters" in your settings.')
+    return;
   }
-  return launchConfigs;
+  let launchConfigs: object[] = [];
+  filters.forEach(element => {
+    launchConfigs.push({ "Filter": element });
+  });
+
+  exportSplitObjects(launchConfigs);
 }
 
 function focusTerminal() {
@@ -85,9 +83,8 @@ function focusTerminal() {
   ShowTerminal();
 }
 
-export function exportSplitObjects() {
+function exportSplitObjects(launchConfigs: object[]) {
   focusTerminal();
-  let launchConfigs = getNAVExportFilter();
   let exportFolder = "temp/export/";
   let filename = `temp/export.txt`
   RunPowershellCommand("New-Item", { "ItemType": "Directory", "Path": exportFolder, "ErrorAction": "Ignore" })
