@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "publisher": "jonasandersen",
     "engines": {
-        "vscode": "^1.16.0"
+        "vscode": "^1.19.0"
     },
     "categories": [
         "Other"
@@ -63,15 +63,23 @@
                     },
                     "finsqltools.databasename": {
                         "type": "string",
-                        "default": ""
+                        "default": "",
+                        "description": "Database name."
                     },
                     "finsqltools.databaseserver": {
                         "type": "string",
-                        "default": "localhost"
+                        "default": "localhost",
+                        "description": "Database server where the NAV database is located."
                     },
                     "finsqltools.import.compileafter": {
                         "type": "boolean",
-                        "default": true
+                        "default": true,
+                        "description": "Compile nav objects after importing objects."
+                    },
+                    "finsqltools.import.fromhash": {
+                        "type": "string",
+                        "default": "HEAD~1",
+                        "description": "Suggested value when importing NAV objects."
                     },
                     "finsqltools.export.unlicensedasbinary": {
                         "type": "boolean",

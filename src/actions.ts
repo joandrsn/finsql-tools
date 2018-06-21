@@ -182,9 +182,11 @@ function importObjects(from: string, to: string) {
 export function ImportObjects() {
   let fromCommit = "";
   let toCommit = "";
+  let config = workspace.getConfiguration('finsqltools');
+  let fromhash: string = config.get('import.fromhash');
   let fromOptions: InputBoxOptions = {
     prompt: "From which git commit",
-    value: "HEAD^1"
+    value: fromhash
   }
   let toOptions: InputBoxOptions = {
     prompt: "To which git commit",
