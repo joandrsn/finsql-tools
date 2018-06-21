@@ -64,10 +64,10 @@ export function exportFiltersFromNAV() {
 export function exportAllFromNAV() {
   let config = workspace.getConfiguration('finsqltools');
   let filters: string[] = config.get('export.filters');
-  if (filters.length === 0) {
+/*   if (filters.length === 0) {
     window.showErrorMessage('There are no filters set up in settings. Please add filters in "finsqltools.export.filters" in your settings.')
     return;
-  }
+  } */
   let launchConfigs: object[] = [];
   filters.forEach(element => {
     launchConfigs.push({ "Filter": element });
