@@ -112,6 +112,11 @@
                         "type": "boolean",
                         "default": true,
                         "description": "Show the terminal before executing a command."
+                    },
+                    "finsqltools.lazyinitializeterminal": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "Only launch the terminal when a command has been chosen. Set to false if you want the terminal to be available right away."
                     }
                 }
             }

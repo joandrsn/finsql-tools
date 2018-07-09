@@ -55,13 +55,13 @@ export function relaunchTerminal() {
   ShowTerminal();
 }
 
-export function exportFiltersFromNAV() {
+export function exportAllFromNAV() {
   let launchConfigs: object[] = [];
   launchConfigs.push({ "Filter": undefined });
   exportSplitObjects(launchConfigs);
 }
 
-export function exportAllFromNAV() {
+export function exportFiltersFromNAV() {
   let config = workspace.getConfiguration('finsqltools');
   let filters: string[] = config.get('export.filters');
 /*   if (filters.length === 0) {
@@ -83,8 +83,16 @@ function focusTerminal() {
   ShowTerminal();
 }
 
+function CreateTempFolder() {
+  let foldername = "temp";
+  if (existsSync(foldername)) 
+    return;
+  RunPowershellCommand("New-Item", { "ItemType": "Directory", "Path": foldername, "ErrorAction": "Ignore" })
+}
+
 function exportSplitObjects(launchConfigs: object[]) {
   focusTerminal();
+  CreateTempFolder();
   let exportFolder = "temp/export/";
   let filename = `temp/export.txt`
   RunPowershellCommand("New-Item", { "ItemType": "Directory", "Path": exportFolder, "ErrorAction": "Ignore" })
@@ -155,6 +163,7 @@ function copyNAVObjectProperties(splitLocation: string) {
 
 function importObjects(from: string, to: string) {
   focusTerminal();
+  CreateTempFolder();
   let config = workspace.getConfiguration('finsqltools');
   let compileafter: boolean = config.get('import.compileafter');
   RunPowershellCommand("Invoke-Expression", { "Command": `git diff ${from}..${to} --name-only --diff-filter d src/` }, "ImportFiles")
