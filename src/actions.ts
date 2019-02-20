@@ -64,10 +64,10 @@ export function exportAllFromNAV() {
 export function exportFiltersFromNAV() {
   let config = workspace.getConfiguration('finsqltools');
   let filters: string[] = config.get('export.filters');
-/*   if (filters.length === 0) {
+  if (filters.length === 0) {
     window.showErrorMessage('There are no filters set up in settings. Please add filters in "finsqltools.export.filters" in your settings.')
     return;
-  } */
+  }
   let launchConfigs: object[] = [];
   filters.forEach(element => {
     launchConfigs.push({ "Filter": element });
@@ -168,7 +168,22 @@ function importObjects(from: string, to: string) {
   let compileafter: boolean = config.get('import.compileafter');
   RunPowershellCommand("Invoke-Expression", { "Command": `git diff ${from}..${to} --name-only --diff-filter d src/` }, "ImportFiles")
   let importfile = "temp/import.txt";
-  RunPowershellCommand("Join-NAVApplicationObjectFile", { "Source": "$ImportFiles", "Destination": importfile, "Force": undefined });
+  RunPowershellCommand("New-Object", {"TypeName": "System.IO.FileStream", "ArgumentList": [importfile, 'Create', 'ReadWrite']}, "StreamWriter");
+
+  let joinScript = 
+`foreach($ChangedFile in $ImportFiles) {
+  $PathObj = Resolve-Path $ChangedFile
+  $StreamReader = New-Object -TypeName "System.IO.FileStream" -ArgumentList $PathObj.Path, 'Open', 'Read'
+  $StreamReader.CopyTo($StreamWriter)
+
+  $StreamReader.Close()
+  $StreamReader.Dispose()
+}
+$StreamWriter.Close()
+$StreamWriter.Dispose()`;
+  RunRawPowershellCommand(joinScript);
+  return;
+
   let importParameters = {
     "Path": importfile,
     "DatabaseName": "$Database",
@@ -265,7 +280,6 @@ function generateGitIgnoreFile() {
 export function startNAVIDE() {
   focusTerminal();
   let config = workspace.getConfiguration('finsqltools');
-  let value = config.get('nstpath');
   let databaseServer = config.get('databaseserver')
   let database = config.get('databasename');
   let parameters: string[] = [];
