@@ -2,6 +2,7 @@ import { DefinePowershellVariable, RunPowershellCommand, ShowTerminal, RelaunchT
 import { workspace, WorkspaceFolder, window, InputBoxOptions } from 'vscode';
 import { join } from 'path';
 import { existsSync, writeFile, mkdirSync} from 'fs';
+import { ModifiedConfig, modifiedConfigToString, _modifiedConfigFromString } from "./modifiedenum";
 
 export function initialize() {
   let config = workspace.getConfiguration('finsqltools');
@@ -84,8 +85,10 @@ function focusTerminal() {
 }
 
 function CreateTempFolder() {
-  let foldername = "temp";
-  if (existsSync(foldername)) 
+  createFolderIfNotExists("temp");
+}
+function createFolderIfNotExists(foldername: string) {
+  if (existsSync(foldername))
     return;
   RunPowershellCommand("New-Item", { "ItemType": "Directory", "Path": foldername, "ErrorAction": "Ignore" })
 }
@@ -95,7 +98,7 @@ function exportSplitObjects(launchConfigs: object[]) {
   CreateTempFolder();
   let exportFolder = "temp/export/";
   let filename = `temp/export.txt`
-  RunPowershellCommand("New-Item", { "ItemType": "Directory", "Path": exportFolder, "ErrorAction": "Ignore" })
+  createFolderIfNotExists(exportFolder);
   launchConfigs.forEach(element => {
     let exportParameters = {
       'DatabaseName': "$Database",
@@ -121,14 +124,13 @@ function exportSplitObjects(launchConfigs: object[]) {
   let splitFiles = join(exportFolder, "*.txt");
   copyNAVObjectProperties(splitFiles);
   RunPowershellCommand("Move-Item", { "Path": splitFiles, "Destination": 'src/', "Force": undefined })
-  //if(not exportunlicensedasbinary)
-  //return
+
 }
 
 function copyNAVObjectProperties(splitLocation: string) {
   let config = workspace.getConfiguration('finsqltools');
   let resetDate: boolean = config.get('export.resetdate');
-  let resetModified: boolean = config.get('export.resetmodified');
+  let resetModified: ModifiedConfig = config.get('export.resetmodified');
   if (!(resetDate || resetModified))
     return
 
@@ -167,7 +169,7 @@ function importObjects(from: string, to: string) {
   let config = workspace.getConfiguration('finsqltools');
   let compileafter: boolean = config.get('import.compileafter');
   RunPowershellCommand("Invoke-Expression", { "Command": `git diff ${from}..${to} --name-only --diff-filter d src/` }, "ImportFiles")
-  let importfile = "temp/import.txt";
+  let importfile = "./temp/import.txt";
   RunPowershellCommand("New-Object", {"TypeName": "System.IO.FileStream", "ArgumentList": [importfile, 'Create', 'ReadWrite']}, "StreamWriter");
 
   let joinScript = 
@@ -182,7 +184,6 @@ function importObjects(from: string, to: string) {
 $StreamWriter.Close()
 $StreamWriter.Dispose()`;
   RunRawPowershellCommand(joinScript);
-  return;
 
   let importParameters = {
     "Path": importfile,

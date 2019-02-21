@@ -92,7 +92,11 @@
                     },
                     "finsqltools.export.filters": {
                         "type": "array",
-                        "description": "Export once for each of these filters. Filters found at https://docs.microsoft.com/en-us/dynamics-nav/exportobjects. A filter like ['Modified=1','Type=Table;ID=18'] would export modifed objects first, then the customer table"
+                        "description": "Export once for each of these filters. Filters found at https://docs.microsoft.com/en-us/dynamics-nav/exportobjects. A filter like ['Modified=1','Type=Table;ID=18'] would export modifed objects first, then the customer table",
+                        "items": {
+                            "type": "string",
+                            "description": "Single filter"
+                        }
                     },
                     "finsqltools.uidoffset": {
                         "type": "integer",
@@ -106,6 +110,12 @@
                     "finsqltools.export.resetmodified": {
                         "type": "boolean",
                         "default": true,
+                        "enum": ["never", "copy", "remove"],
+                        "enumDescriptions": [
+                            "Leave it as is",
+                            "Copy the modified value from the original object (if it exists) and apply it to the current object",
+                            "Remove the modified tag"
+                        ],
                         "description": "When exporting, copy the modified value from the original object (if exists) and apply it to the current object."
                     },
                     "finsqltools.focusterminalonaction": {
