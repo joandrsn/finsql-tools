@@ -108,15 +108,15 @@
                         "description": "When exporting, copy the datetime value from the original object (if exists) and apply it to the current object."
                     },
                     "finsqltools.export.resetmodified": {
-                        "type": "boolean",
-                        "default": true,
+                        "type": "string",
+                        "default": "copy",
                         "enum": ["never", "copy", "remove"],
                         "enumDescriptions": [
                             "Leave it as is",
                             "Copy the modified value from the original object (if it exists) and apply it to the current object",
                             "Remove the modified tag"
                         ],
-                        "description": "When exporting, copy the modified value from the original object (if exists) and apply it to the current object."
+                        "description": "When exporting, what should the modified value be set to."
                     },
                     "finsqltools.focusterminalonaction": {
                         "type": "boolean",
@@ -134,12 +134,10 @@
     },
     "scripts": {
         "vscode:prepublish": "npm run compile",
-        "compile": "npm run powershell && tsc -p ./",
-        "watch": "npm run powershell && tsc -watch -p ./",
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./",
         "postinstall": "node ./node_modules/vscode/bin/install",
-        "test": "npm run compile && node ./node_modules/vscode/bin/test",
-        "powershell": "powershell -noprofile -file ./psscripts/copyps.ps1",
-        "updatepsmodules": "powershell -noprofile -file ./psscripts/update_modules.ps1"
+        "test": "npm run compile && node ./node_modules/vscode/bin/test"
     },
     "devDependencies": {
         "typescript": "^2.6.1",

@@ -1,70 +1,25 @@
-import { DefinePowershellVariable, RunPowershellCommand, ShowTerminal, RelaunchTerminal, RunRawPowershellCommand } from "./powershellrunner";
+import { RunPowershellCommand, ShowTerminal, RelaunchTerminal, RunRawPowershellCommand, setTerminalVariables, getCurrentSettings } from "./powershellrunner";
 import { workspace, WorkspaceFolder, window, InputBoxOptions } from 'vscode';
 import { join } from 'path';
 import { existsSync, writeFile, mkdirSync} from 'fs';
-import { ModifiedConfig, modifiedConfigToString, _modifiedConfigFromString } from "./modifiedenum";
-
-export function initialize() {
-  let config = workspace.getConfiguration('finsqltools');
-  let rtcpath: string = config.get('rtcpath');
-  let nstpath: string = config.get('nstpath');
-  let databasename = config.get('databasename');
-  let databaseserver = config.get('databaseserver');
-  let silentprogresspreference = config.get('silentprogresspreference');
-
-  DefinePowershellVariable('RTCPath', rtcpath);
-  DefinePowershellVariable('NAVIde', join(rtcpath, 'finsql.exe'));
-  DefinePowershellVariable('NSTPath', nstpath);
-  DefinePowershellVariable('Database', databasename);
-  DefinePowershellVariable('Databaseserver', databaseserver);
-  if(silentprogresspreference)
-    DefinePowershellVariable('ProgressPreference', "SilentlyContinue");
-  let modulesImportList = getInstallPathModules(rtcpath, nstpath);
-  modulesImportList.forEach(element => {
-    RunPowershellCommand('Import-Module', { "Name": element, "DisableNameChecking": undefined });
-  });
-}
-
-function getInstallPathModules(rtcPath: string, nstPath: string): string[] {
-  let modules = ["Microsoft.Dynamics.Nav.Model.Tools.dll", "Microsoft.Dynamics.Nav.Ide.psm1", "Microsoft.Dynamics.Nav.Management.dll"];
-  let importList: string[] = [];
-  modules.forEach(element => {
-    let moduleresult = testModulePath(rtcPath, nstPath, element);
-    if (moduleresult !== undefined)
-      importList.push(moduleresult);
-  });
-  return importList;
-}
-
-function testModulePath(rtcPath: string, nstPath: string, file: string): string {
-  if (rtcPath !== undefined) {
-    let filepath = join(rtcPath, file);
-    if (existsSync(filepath))
-      return filepath;
-  }
-  if (nstPath !== undefined) {
-    let filepath = join(nstPath, file);
-    if (existsSync(filepath))
-      return filepath;
-  }
-  return undefined;
-}
+import { ModifiedConfig, convertModifiedConfigFromString } from "./modifiedenum";
 
 export function relaunchTerminal() {
   RelaunchTerminal();
-  initialize();
   ShowTerminal();
 }
 
 export function exportAllFromNAV() {
+  setTerminalVariables();
   let launchConfigs: object[] = [];
   launchConfigs.push({ "Filter": undefined });
   exportSplitObjects(launchConfigs);
 }
 
 export function exportFiltersFromNAV() {
-  let config = workspace.getConfiguration('finsqltools');
-  let filters: string[] = config.get('export.filters');
+  setTerminalVariables();
+  let settings = getCurrentSettings();
+  let filters: string[] = settings.export.filters;
   if (filters.length === 0) {
     window.showErrorMessage('There are no filters set up in settings. Please add filters in "finsqltools.export.filters" in your settings.')
     return;
@@ -77,13 +32,6 @@ export function exportFiltersFromNAV() {
   exportSplitObjects(launchConfigs);
 }
 
-function focusTerminal() {
-  let config = workspace.getConfiguration('finsqltools');
-  if (!config.get('focusterminalonaction'))
-    return
-  ShowTerminal();
-}
-
 function CreateTempFolder() {
   createFolderIfNotExists("temp");
 }
@@ -94,7 +42,7 @@ function createFolderIfNotExists(foldername: string) {
 }
 
 function exportSplitObjects(launchConfigs: object[]) {
-  focusTerminal();
+  ShowTerminal();
   CreateTempFolder();
   let exportFolder = "temp/export/";
   let filename = `temp/export.txt`
@@ -128,46 +76,50 @@ function exportSplitObjects(launchConfigs: object[]) {
 }
 
 function copyNAVObjectProperties(splitLocation: string) {
-  let config = workspace.getConfiguration('finsqltools');
-  let resetDate: boolean = config.get('export.resetdate');
-  let resetModified: ModifiedConfig = config.get('export.resetmodified');
-  if (!(resetDate || resetModified))
+  let settings = getCurrentSettings();
+  let resetDate: boolean = settings.export.resetdate;
+  let resetModified: ModifiedConfig = convertModifiedConfigFromString(settings.export.resetmodified);
+  if (!resetDate && resetModified === ModifiedConfig.never)
     return
 
   RunPowershellCommand("Get-ChildItem", { "Path": splitLocation }, "SplitFiles");
-  let setCommand = "Set-NAVApplicationObjectProperty -TargetPath $exportedObject"
+  let modifiedProp = "";
   let preSetCommand = [];
-  if (resetModified) {
-    preSetCommand.push("$ModifiedStatus = if ($origProps.Modified) {'Yes'} else {'No'}");
-    setCommand += " -ModifiedProperty $ModifiedStatus"
-
+  if (resetModified !== ModifiedConfig.never) {
+    if (resetModified === ModifiedConfig.copy) {
+      preSetCommand.push("$ModifiedStatus = if ($origProps.Modified) {'Yes'} else {'No'}");
+    } else {
+      preSetCommand.push("$ModifiedStatus = 'No'");
+    }
+    modifiedProp = " -ModifiedProperty $ModifiedStatus";
   }
+
+  let datetimeProp = "";
   if (resetDate) {
     preSetCommand.push(`$datetimeProp = $origProps.Date,$origProps.Time -join " "`);
-    setCommand += " -DateTimeProperty $datetimeProp";
+    datetimeProp = " -DateTimeProperty $datetimeProp";
   }
+  preSetCommand.push(`Set-NAVApplicationObjectProperty -TargetPath $exportedObject${modifiedProp}${datetimeProp}`);
 
-  preSetCommand.push(setCommand);
+  let objectSetter = preSetCommand.join("\n  ");
 
   let splitScript = `foreach ($exportedObject in $SplitFiles) {
-    $originalObject = Join-Path "src" $exportedObject.Name
-    if(Test-Path $originalObject) {
-      $origProps = Get-NAVApplicationObjectProperty -Source $originalObject
-      $newProps = Get-NAVApplicationObjectProperty -Source $exportedObject
-      `;
-  splitScript += preSetCommand.join("\n      ");
-  splitScript += `
-    }
-  }`
+$originalObject = Join-Path "src" $exportedObject.Name
+if(Test-Path $originalObject) {
+  $origProps = Get-NAVApplicationObjectProperty -Source $originalObject
+  $newProps = Get-NAVApplicationObjectProperty -Source $exportedObject
+  ${objectSetter}
+  }
+}`
   RunRawPowershellCommand(splitScript);
 
 }
 
 function importObjects(from: string, to: string) {
-  focusTerminal();
+  ShowTerminal();
   CreateTempFolder();
-  let config = workspace.getConfiguration('finsqltools');
-  let compileafter: boolean = config.get('import.compileafter');
+  let settings = getCurrentSettings();
+  let compileafter: boolean = settings.import.compileafter;
   RunPowershellCommand("Invoke-Expression", { "Command": `git diff ${from}..${to} --name-only --diff-filter d src/` }, "ImportFiles")
   let importfile = "./temp/import.txt";
   RunPowershellCommand("New-Object", {"TypeName": "System.IO.FileStream", "ArgumentList": [importfile, 'Create', 'ReadWrite']}, "StreamWriter");
@@ -205,10 +157,11 @@ $StreamWriter.Dispose()`;
 }
 
 export function ImportObjects() {
+  setTerminalVariables();
   let fromCommit = "";
   let toCommit = "";
-  let config = workspace.getConfiguration('finsqltools');
-  let fromhash: string = config.get('import.fromhash');
+  let settings = getCurrentSettings();
+  let fromhash: string = settings.import.fromhash;
   let fromOptions: InputBoxOptions = {
     prompt: "From which git commit",
     value: fromhash
@@ -237,7 +190,7 @@ function getWorkspacePath(): string {
 }
 
 export function generateNAVFolderStructure() {
-  focusTerminal()
+  ShowTerminal()
   generateGitAttributesFile();
   generateGitIgnoreFile();
   generateFolders(["src", "temp"]);
@@ -279,13 +232,12 @@ function generateGitIgnoreFile() {
 }
 
 export function startNAVIDE() {
-  focusTerminal();
-  let config = workspace.getConfiguration('finsqltools');
-  let databaseServer = config.get('databaseserver')
-  let database = config.get('databasename');
+  setTerminalVariables();
+  ShowTerminal();
+  let currentSettings = getCurrentSettings();
   let parameters: string[] = [];
-  parameters.push(`ServerName="${databaseServer}"`);
-  parameters.push(`Database="${database}"`);
-  parameters.push(`ID="${database}"`);
+  parameters.push(`ServerName="${currentSettings.databaseserver}"`);
+  parameters.push(`Database="${currentSettings.databasename}"`);
+  parameters.push(`ID="${currentSettings.databasename}"`);
   RunPowershellCommand("Start-Process", { "FilePath": "$NAVIde", "ArgumentList": parameters.join(",") });
 }

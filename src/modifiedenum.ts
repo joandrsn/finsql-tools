@@ -1,39 +1,18 @@
 export enum ModifiedConfig {
-  Never = 1,
-  Copy = 2,
-  Remove = 3
+  never = 1,
+  copy = 2,
+  remove = 3
 }
 
-export function modifiedConfigToString(modifiedConfig: ModifiedConfig): string {
-  switch (modifiedConfig) {
-    case ModifiedConfig.Copy:
-      return "copy";
-      break;
-    case ModifiedConfig.Never:
-      return "never";
-      break;
-    case ModifiedConfig.Remove:
-      return "remove";
-      break;
-    default:
-      throw new Error('modifiedConfigToString: Unknown modifiedConfig');
-      break;
-  }
-}
-
-export function _modifiedConfigFromString(modifiedConfig: string | undefined): ModifiedConfig {
-  switch (modifiedConfig) {
-    case "copy":
-      return ModifiedConfig.Copy;
-      break;
-    case "never":
-      return ModifiedConfig.Never;
-      break;
-    case "remove":
-      return ModifiedConfig.Remove;
-      break;
-    default:
-      throw new Error('_modifiedConfigFromString: Unknown modifiedConfig')
-      break;
+export function convertModifiedConfigFromString(currentModifiedConfig: string) {
+  if(currentModifiedConfig === "never"){
+    return ModifiedConfig.never;
+  } else if (currentModifiedConfig === "copy"){
+    return ModifiedConfig.copy;
+  } else if (currentModifiedConfig === "remove") {
+    return ModifiedConfig.remove;
+  } else {
+    //Default case
+    return ModifiedConfig.copy;
   }
 }
