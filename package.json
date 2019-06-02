@@ -110,7 +110,11 @@
                     "finsqltools.export.resetmodified": {
                         "type": "string",
                         "default": "copy",
-                        "enum": ["never", "copy", "remove"],
+                        "enum": [
+                            "never",
+                            "copy",
+                            "remove"
+                        ],
                         "enumDescriptions": [
                             "Leave it as is",
                             "Copy the modified value from the original object (if it exists) and apply it to the current object",
