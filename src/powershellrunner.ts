@@ -2,6 +2,7 @@ import { PowerShellCommand, PowerShellVariable } from "./powershell";
 import { window, Terminal } from "vscode";
 import * as Settings from "./settings";
 import { getModulesInstallPath } from "./powershellmodules";
+import { runNavIdeCommand } from "./powershellfunctions";
 
 const terminalIdentifier = 'Finsql tools Shell';
 let terminal: Terminal = undefined;
@@ -55,6 +56,7 @@ function respawnTerminal(settings){
     modulesImportList.forEach(element => {
         RunPowershellCommand('Import-Module', { "Name": element, "DisableNameChecking": undefined });
     });
+    RunRawPowershellCommand(runNavIdeCommand());
 }
 
 function hasCriticalSettingsChanged(newSettings){

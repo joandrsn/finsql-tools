@@ -3,6 +3,7 @@ import { workspace, WorkspaceFolder, window, InputBoxOptions } from 'vscode';
 import { join } from 'path';
 import { existsSync, writeFile, mkdirSync} from 'fs';
 import { ModifiedConfig, convertModifiedConfigFromString } from "./modifiedenum";
+import { buildCommandArguments } from "./finsqlfunctions";
 
 export function relaunchTerminal() {
   RelaunchTerminal();
@@ -48,16 +49,20 @@ function exportSplitObjects(launchConfigs: object[]) {
   let filename = `temp/export.txt`
   createFolderIfNotExists(exportFolder);
   launchConfigs.forEach(element => {
-    let exportParameters = {
-      'DatabaseName': "$Database",
-      "Path": filename,
-      "DatabaseServer": "$DatabaseServer",
-      "Force": undefined,
-      "ExportTxtSkipUnlicensed": undefined
+    let launchoptions = {
+      "database": "$Database",
+      "file": filename,
+      "servername": "$DatabaseServer",
+      "ExportTxtSkipUnlicensed": 1
     }
     if (element["Filter"] !== undefined)
-      exportParameters["Filter"] = element["Filter"];
-    RunPowershellCommand("Export-NAVApplicationObject", exportParameters)
+      launchoptions["filter"] = element["Filter"];
+    let exportParameters = {
+      "NAVIDE": "$NavIde",
+      "ID": "$Database",
+      "Command": buildCommandArguments("exportobjects", launchoptions),
+    }
+    RunPowershellCommand("Invoke-NAVIdeCommand", exportParameters)
 
     let splitParameters = {
       "Source": filename,
@@ -72,7 +77,6 @@ function exportSplitObjects(launchConfigs: object[]) {
   let splitFiles = join(exportFolder, "*.txt");
   copyNAVObjectProperties(splitFiles);
   RunPowershellCommand("Move-Item", { "Path": splitFiles, "Destination": 'src/', "Force": undefined })
-
 }
 
 function copyNAVObjectProperties(splitLocation: string) {
