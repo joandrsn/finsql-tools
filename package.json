@@ -75,6 +75,16 @@
                         "default": "localhost",
                         "description": "Database server where the NAV database is located."
                     },
+                    "finsqltools.navserverinstance": {
+                        "type": "string",
+                        "default": "",
+                        "description": "Name of the instance of which the NAV server is running."
+                    },
+                    "finsqltools.navservername": {
+                        "type": "string",
+                        "default": "localhost",
+                        "description": "Servername where the NAV service is running."
+                    },
                     "finsqltools.import.compileafter": {
                         "type": "boolean",
                         "default": true,

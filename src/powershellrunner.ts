@@ -62,10 +62,7 @@ function respawnTerminal(settings) {
 function hasCriticalSettingsChanged(newSettings) {
     if (currentSettings === undefined)
         return true;
-    return (currentSettings.rtcpath !== newSettings.rtcpath) ||
-        (currentSettings.nstpath !== newSettings.nstpath) ||
-        (currentSettings.databasename !== newSettings.databasename) ||
-        (currentSettings.databaseserver !== newSettings.databaseserver);
+    return !currentSettings.hasSameBaseSettings(newSettings);
 }
 
 export function getCurrentSettings(): ExtensionSettings {

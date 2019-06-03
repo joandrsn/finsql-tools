@@ -30,7 +30,9 @@ export function load(): ExtensionSettings {
   settings.id = configuration.get<string>('id', "");
   if (settings.id === "")
     settings.id = settings.databasename;
-  settings.databaseserver = configuration.get<string>('databaseserver');
+  settings.navserverinstance = configuration.get<string>('navserverinstance', "");
+  settings.navservername = configuration.get<string>('navservername', "localhost");
+  settings.databaseserver = configuration.get<string>('databaseserver', "localhost");
   settings.silentprogresspreference = configuration.get<boolean>('silentprogresspreference', true);
   settings.focusterminalonaction = configuration.get<boolean>('focusterminalonaction', true);
   settings.export = extensionExportSettings;
@@ -46,6 +48,8 @@ export class ExtensionSettings {
   nstpath: string;
   databasename: string;
   databaseserver: string;
+  navserverinstance: string;
+  navservername: string;
   silentprogresspreference: boolean;
   focusterminalonaction: boolean;
   export: ExtensionExportSettings;

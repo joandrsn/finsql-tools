@@ -1,7 +1,11 @@
 import { ExtensionSettings } from "./settings";
 
-export function buildCommandArguments(command: string, params: object): string {
+function buildCommandArguments(command: string, params: object, settings: ExtensionSettings): string {
   params['command'] = command;
+  if (settings.navserverinstance !== "") {
+    params['navserverinstance'] = settings.navserverinstance;
+    params['navservername'] = settings.navservername;
+  }
   return buildArgString(params);
 }
 
@@ -27,33 +31,30 @@ export function getExportOptions(filter: string, filename: string, settings: Ext
   const command = "exportobjects";
   let options = getStandardOptions(settings);
   options["file"] = filename;
-  options["ExportTxtSkipUnlicensed"] = 1;
+  options["exporttxtskipunlicensed"] = 1;
   if (filter !== undefined)
     options["filter"] = filter;
 
-  return buildCommandArguments(command, options);
+  return buildCommandArguments(command, options, settings);
 }
 export function getImportOptions(filename: string, settings: ExtensionSettings): string {
   const command = "importobjects";
   let options = getStandardOptions(settings);
+  options["file"] = filename;
+  options["importaction"] = "overwrite";
+  options["synchronizeschemachanges"] = "no"
 
-  return buildCommandArguments(command, options);
+  return buildCommandArguments(command, options, settings);
 }
 export function getCompileOptions(settings: ExtensionSettings): string {
   const command = "compileobjects";
   let options = getStandardOptions(settings);
+  options["filter"] = "compiled=0";
 
-  return buildCommandArguments(command, options);
+  return buildCommandArguments(command, options, settings);
 }
 export function getStartOptions(settings: ExtensionSettings): string {
   let options = getStandardOptions(settings);
 
   return buildArgString(options);
 }
-
-
-// Import, export, compile, start
-
-//Must have
-// database, databaserver, 
-//

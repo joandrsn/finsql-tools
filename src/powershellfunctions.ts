@@ -1,6 +1,5 @@
 export function runNavIdeCommand() {
-  return `
-function Invoke-NAVIdeCommand {
+  return `function Invoke-NAVIdeCommand {
   [CmdletBinding()]
   param(
     [Parameter(Mandatory)]
@@ -14,9 +13,9 @@ function Invoke-NAVIdeCommand {
   $null = New-Item -Type Directory $tempdir
   $logfile = Join-Path $tempdir "naverrorlog.txt"
   $commandresult = Join-Path $tempdir "navcommandresult.txt"
-  $arguments = '{0},LogFile="{1}",ID="{2}"' -f $Command,$logfile,$ID
+  $arguments = '{0},LogFile="{1}"' -f $Command,$logfile
 
-  #Start-Process -FilePath $NAVIDE -ArgumentList $arguments -Wait
+  Start-Process -FilePath $NAVIDE -ArgumentList $arguments -Wait
 
   $errorraised = $false
   $output = ""

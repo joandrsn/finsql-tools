@@ -4,7 +4,7 @@ import { join } from 'path';
 import { existsSync, writeFile, mkdirSync } from 'fs';
 import { ModifiedConfig } from "./modifiedenum";
 import { ExtensionSettings } from "./settings";
-import { getExportOptions, getStartOptions, buildCommandArguments } from "./finsqlfunctions";
+import { getExportOptions, getStartOptions, getImportOptions, getCompileOptions } from "./finsqlfunctions";
 
 export function relaunchTerminal() {
   RelaunchTerminal();
@@ -132,22 +132,17 @@ $StreamWriter.Dispose()`;
   RunRawPowershellCommand(joinScript);
 
   let importParameters = {
-    "Path": importfile,
-    "DatabaseName": "$Database",
-    "DatabaseServer": "$DatabaseServer",
-    "ImportAction": "Overwrite",
-    "SynchronizeSchemaChanges": "No"
+    "Navide": "$Navide",
+    "Command": getImportOptions(importfile, settings)
   }
-  RunPowershellCommand("Import-NAVApplicationObject", importParameters);
+  RunPowershellCommand("Invoke-NAVIdeCommand", importParameters);
   if (compileafter) {
     let compileparameters = {
-      "DatabaseName": "$Database",
-      "DatabaseServer": "$DatabaseServer",
-      "SynchronizeSchemaChanges": "No"
+      "Navide": "$Navide",
+      "Command": getCompileOptions(settings),
     }
-    RunPowershellCommand("Compile-NAVApplicationObject", compileparameters);
+    RunPowershellCommand("Invoke-NAVIdeCommand", compileparameters);
   }
-
 }
 
 export function ImportObjects() {
