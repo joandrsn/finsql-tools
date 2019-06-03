@@ -66,6 +66,10 @@
                         "default": "",
                         "description": "Database name."
                     },
+                    "finsqltools.id": {
+                        "type": "string",
+                        "description": "Launch ID."
+                    },
                     "finsqltools.databaseserver": {
                         "type": "string",
                         "default": "localhost",

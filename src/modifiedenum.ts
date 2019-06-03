@@ -4,15 +4,21 @@ export enum ModifiedConfig {
   remove = 3
 }
 
-export function convertModifiedConfigFromString(currentModifiedConfig: string) {
-  if(currentModifiedConfig === "never"){
-    return ModifiedConfig.never;
-  } else if (currentModifiedConfig === "copy"){
-    return ModifiedConfig.copy;
-  } else if (currentModifiedConfig === "remove") {
-    return ModifiedConfig.remove;
-  } else {
-    //Default case
-    return ModifiedConfig.copy;
+export function convertModifiedConfigFromString(currentModifiedConfig: string): ModifiedConfig {
+  let result: ModifiedConfig;
+  switch (currentModifiedConfig) {
+    case "never":
+      result = ModifiedConfig.never
+      break;
+    case "copy":
+      result = ModifiedConfig.copy;
+      break;
+    case "remove":
+      result = ModifiedConfig.remove;
+      break;
+    default:
+      result = ModifiedConfig.copy
+      break;
   }
+  return result;
 }

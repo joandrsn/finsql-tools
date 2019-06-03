@@ -1,12 +1,12 @@
 import { PowerShellCommand, PowerShellVariable } from "./powershell";
 import { window, Terminal } from "vscode";
-import * as Settings from "./settings";
+import { load as loadSettings, ExtensionSettings } from "./settings";
 import { getModulesInstallPath } from "./powershellmodules";
 import { runNavIdeCommand } from "./powershellfunctions";
 
 const terminalIdentifier = 'Finsql tools Shell';
 let terminal: Terminal = undefined;
-let currentSettings = undefined;
+let currentSettings: ExtensionSettings = undefined;
 
 export function RunPowershellCommand(command: string, parameters: object, variablename?: string) {
     let powershell: PowerShellCommand = new PowerShellCommand(command, parameters);
@@ -34,14 +34,14 @@ export function RunRawPowershellCommand(command: string) {
 }
 
 export function setTerminalVariables() {
-    let settings = Settings.load();
-    if(hasCriticalSettingsChanged(settings)){
+    let settings = loadSettings();
+    if (hasCriticalSettingsChanged(settings)) {
         respawnTerminal(settings);
     }
     currentSettings = settings;
 }
 
-function respawnTerminal(settings){
+function respawnTerminal(settings) {
     if (terminal !== undefined)
         terminal.dispose();
     terminal = window.createTerminal(terminalIdentifier);
@@ -59,15 +59,20 @@ function respawnTerminal(settings){
     RunRawPowershellCommand(runNavIdeCommand());
 }
 
-function hasCriticalSettingsChanged(newSettings){
+function hasCriticalSettingsChanged(newSettings) {
     if (currentSettings === undefined)
         return true;
-    return (currentSettings.rtcpath !== newSettings.rtcpath) || 
+    return (currentSettings.rtcpath !== newSettings.rtcpath) ||
         (currentSettings.nstpath !== newSettings.nstpath) ||
         (currentSettings.databasename !== newSettings.databasename) ||
         (currentSettings.databaseserver !== newSettings.databaseserver);
 }
 
-export function getCurrentSettings() {
-    return Object.assign({}, currentSettings);
+export function getCurrentSettings(): ExtensionSettings {
+    return clone<ExtensionSettings>(currentSettings);
+}
+function clone<T>(instance: T): T {
+    const copy = new (instance.constructor as { new(): T })();
+    Object.assign(copy, instance);
+    return copy;
 }

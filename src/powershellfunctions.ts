@@ -6,9 +6,7 @@ function Invoke-NAVIdeCommand {
     [Parameter(Mandatory)]
     [string]$NAVIDE,
     [Parameter(Mandatory)]
-    [String]$Command,
-    [Parameter(Mandatory)]
-    [String]$ID
+    [String]$Command
   )
 
   $guid = [Guid]::NewGuid().Guid

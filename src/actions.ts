@@ -1,9 +1,10 @@
 import { RunPowershellCommand, ShowTerminal, RelaunchTerminal, RunRawPowershellCommand, setTerminalVariables, getCurrentSettings } from "./powershellrunner";
 import { workspace, WorkspaceFolder, window, InputBoxOptions } from 'vscode';
 import { join } from 'path';
-import { existsSync, writeFile, mkdirSync} from 'fs';
-import { ModifiedConfig, convertModifiedConfigFromString } from "./modifiedenum";
-import { buildCommandArguments } from "./finsqlfunctions";
+import { existsSync, writeFile, mkdirSync } from 'fs';
+import { ModifiedConfig } from "./modifiedenum";
+import { ExtensionSettings } from "./settings";
+import { getExportOptions, getStartOptions, buildCommandArguments } from "./finsqlfunctions";
 
 export function relaunchTerminal() {
   RelaunchTerminal();
@@ -12,9 +13,9 @@ export function relaunchTerminal() {
 
 export function exportAllFromNAV() {
   setTerminalVariables();
-  let launchConfigs: object[] = [];
-  launchConfigs.push({ "Filter": undefined });
-  exportSplitObjects(launchConfigs);
+  let settings = getCurrentSettings();
+  settings.export.filters = [undefined];
+  exportSplitObjects(settings);
 }
 
 export function exportFiltersFromNAV() {
@@ -25,12 +26,8 @@ export function exportFiltersFromNAV() {
     window.showErrorMessage('There are no filters set up in settings. Please add filters in "finsqltools.export.filters" in your settings.')
     return;
   }
-  let launchConfigs: object[] = [];
-  filters.forEach(element => {
-    launchConfigs.push({ "Filter": element });
-  });
 
-  exportSplitObjects(launchConfigs);
+  exportSplitObjects(settings);
 }
 
 function CreateTempFolder() {
@@ -42,38 +39,31 @@ function createFolderIfNotExists(foldername: string) {
   RunPowershellCommand("New-Item", { "ItemType": "Directory", "Path": foldername, "ErrorAction": "Ignore" })
 }
 
-function exportSplitObjects(launchConfigs: object[]) {
+function exportSplitObjects(settings: ExtensionSettings) {
   ShowTerminal();
   CreateTempFolder();
   let exportFolder = "temp/export/";
   let filename = `temp/export.txt`
   createFolderIfNotExists(exportFolder);
-  launchConfigs.forEach(element => {
-    let launchoptions = {
-      "database": "$Database",
-      "file": filename,
-      "servername": "$DatabaseServer",
-      "ExportTxtSkipUnlicensed": 1
-    }
-    if (element["Filter"] !== undefined)
-      launchoptions["filter"] = element["Filter"];
+
+  settings.export.filters.forEach(filter => {
     let exportParameters = {
       "NAVIDE": "$NavIde",
-      "ID": "$Database",
-      "Command": buildCommandArguments("exportobjects", launchoptions),
-    }
-    RunPowershellCommand("Invoke-NAVIdeCommand", exportParameters)
+      "Command": getExportOptions(filter, filename, settings),
+    };
+    RunPowershellCommand("Invoke-NAVIdeCommand", exportParameters);
 
     let splitParameters = {
       "Source": filename,
       "Destination": exportFolder,
       "PreserveFormatting": undefined,
       "Force": undefined,
-      "ErrorAction": "Ignore"
-    }
+      "ErrorAction": "Ignore",
+    };
 
     RunPowershellCommand("Split-NAVApplicationObjectFile", splitParameters);
-  });
+  }
+  );
   let splitFiles = join(exportFolder, "*.txt");
   copyNAVObjectProperties(splitFiles);
   RunPowershellCommand("Move-Item", { "Path": splitFiles, "Destination": 'src/', "Force": undefined })
@@ -82,7 +72,7 @@ function exportSplitObjects(launchConfigs: object[]) {
 function copyNAVObjectProperties(splitLocation: string) {
   let settings = getCurrentSettings();
   let resetDate: boolean = settings.export.resetdate;
-  let resetModified: ModifiedConfig = convertModifiedConfigFromString(settings.export.resetmodified);
+  let resetModified = settings.export.resetmodified;
   if (!resetDate && resetModified === ModifiedConfig.never)
     return
 
@@ -126,10 +116,10 @@ function importObjects(from: string, to: string) {
   let compileafter: boolean = settings.import.compileafter;
   RunPowershellCommand("Invoke-Expression", { "Command": `git diff ${from}..${to} --name-only --diff-filter d src/` }, "ImportFiles")
   let importfile = "./temp/import.txt";
-  RunPowershellCommand("New-Object", {"TypeName": "System.IO.FileStream", "ArgumentList": [importfile, 'Create', 'ReadWrite']}, "StreamWriter");
+  RunPowershellCommand("New-Object", { "TypeName": "System.IO.FileStream", "ArgumentList": [importfile, 'Create', 'ReadWrite'] }, "StreamWriter");
 
-  let joinScript = 
-`foreach($ChangedFile in $ImportFiles) {
+  let joinScript =
+    `foreach($ChangedFile in $ImportFiles) {
   $PathObj = Resolve-Path $ChangedFile
   $StreamReader = New-Object -TypeName "System.IO.FileStream" -ArgumentList $PathObj.Path, 'Open', 'Read'
   $StreamReader.CopyTo($StreamWriter)
@@ -165,7 +155,7 @@ export function ImportObjects() {
   let fromCommit = "";
   let toCommit = "";
   let settings = getCurrentSettings();
-  let fromhash: string = settings.import.fromhash;
+  let fromhash = settings.import.fromhash;
   let fromOptions: InputBoxOptions = {
     prompt: "From which git commit",
     value: fromhash
@@ -204,9 +194,9 @@ function generateFolders(paths: string[]) {
   let workdir = getWorkspacePath();
   paths.forEach(element => {
     let path = join(workdir, element);
-    if(!existsSync(path))
+    if (!existsSync(path))
       mkdirSync(path);
-  }) 
+  })
 }
 
 function generateGitAttributesFile() {
@@ -229,7 +219,7 @@ function generateGitIgnoreFile() {
     return
   let gitignoreContent = 'temp\n.vscode';
   writeFile(gitignoreLocation, gitignoreContent, error => {
-    if(error)
+    if (error)
       console.log("Error writing to .gitattributes.");
     RunPowershellCommand("Write-Host", { "Object": `Generated new .gitignore file (${gitignoreLocation})` })
   });
@@ -239,9 +229,6 @@ export function startNAVIDE() {
   setTerminalVariables();
   ShowTerminal();
   let currentSettings = getCurrentSettings();
-  let parameters: string[] = [];
-  parameters.push(`ServerName="${currentSettings.databaseserver}"`);
-  parameters.push(`Database="${currentSettings.databasename}"`);
-  parameters.push(`ID="${currentSettings.databasename}"`);
-  RunPowershellCommand("Start-Process", { "FilePath": "$NAVIde", "ArgumentList": parameters.join(",") });
+  const arglist: string = getStartOptions(currentSettings);
+  RunPowershellCommand("Start-Process", { "FilePath": "$NAVIde", "ArgumentList": arglist });
 }
