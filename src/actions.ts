@@ -2,7 +2,7 @@ import { RunPowershellCommand, ShowTerminal, RelaunchTerminal, RunRawPowershellC
 import { workspace, WorkspaceFolder, window, InputBoxOptions } from 'vscode';
 import { join } from 'path';
 import { existsSync, writeFile, mkdirSync } from 'fs';
-import { ModifiedConfig } from "./modifiedenum";
+import { ModifiedConfig } from "./enums";
 import { ExtensionSettings } from "./settings";
 import { getExportOptions, getStartOptions, getImportOptions, getCompileOptions } from "./finsqlfunctions";
 

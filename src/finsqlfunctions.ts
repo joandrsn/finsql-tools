@@ -1,11 +1,8 @@
 import { ExtensionSettings } from "./settings";
+import { SynchronizeSchemaChangesUtil } from "./enums";
 
 function buildCommandArguments(command: string, params: object, settings: ExtensionSettings): string {
   params['command'] = command;
-  if (settings.navserverinstance !== "") {
-    params['navserverinstance'] = settings.navserverinstance;
-    params['navservername'] = settings.navservername;
-  }
   return buildArgString(params);
 }
 
@@ -50,6 +47,7 @@ export function getCompileOptions(settings: ExtensionSettings): string {
   const command = "compileobjects";
   let options = getStandardOptions(settings);
   options["filter"] = "compiled=0";
+  options["synchronizeschemachanges"] = SynchronizeSchemaChangesUtil.toString(settings.import.synchronizeschemachanges);
 
   return buildCommandArguments(command, options, settings);
 }

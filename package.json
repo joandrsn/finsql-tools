@@ -2,7 +2,7 @@
     "name": "finsql-tools",
     "displayName": "Finsql tools",
     "description": "",
-    "version": "0.6.0",
+    "version": "0.6.1",
     "publisher": "jonasandersen",
     "engines": {
         "vscode": "^1.25.0"
@@ -75,20 +75,20 @@
                         "default": "localhost",
                         "description": "Database server where the NAV database is located."
                     },
-                    "finsqltools.navserverinstance": {
-                        "type": "string",
-                        "default": "",
-                        "description": "Name of the instance of which the NAV server is running."
-                    },
-                    "finsqltools.navservername": {
-                        "type": "string",
-                        "default": "localhost",
-                        "description": "Servername where the NAV service is running."
-                    },
                     "finsqltools.import.compileafter": {
                         "type": "boolean",
                         "default": true,
                         "description": "Compile nav objects after importing objects."
+                    },
+                    "finsqltools.import.synchronizeschemachanges": {
+                        "type": "string",
+                        "default": "no",
+                        "enum": [
+                            "yes",
+                            "no",
+                            "force"
+                        ],
+                        "description": "Synchronize schema changes when compiling setting. Requires 'compileafter' to be set to `true`"
                     },
                     "finsqltools.import.fromhash": {
                         "type": "string",

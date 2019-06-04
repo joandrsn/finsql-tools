@@ -1,7 +1,6 @@
 import { workspace, WorkspaceConfiguration } from "vscode";
-import { ModifiedConfig } from "./modifiedenum";
+import { ModifiedConfig, SynchronizeSchemaChanges, ModifiedConfigUtil, SynchronizeSchemaChangesUtil } from "./enums";
 import { join } from "path";
-import { convertModifiedConfigFromString } from "./modifiedenum";
 
 const finsqlToolsId = "finsqltools";
 
@@ -15,11 +14,13 @@ export function load(): ExtensionSettings {
   extensionExportSettings.filters = configuration.get<string[]>('export.filters');
   extensionExportSettings.resetdate = configuration.get<boolean>('export.resetdate', true);
   let modifiedconfig: string = configuration.get<string>('export.resetmodified', 'copy');
-  extensionExportSettings.resetmodified = convertModifiedConfigFromString(modifiedconfig);
+  extensionExportSettings.resetmodified = ModifiedConfigUtil.parse(modifiedconfig);
 
   let extensionImportSettings: ExtensionImportSettings = new ExtensionImportSettings();
   extensionImportSettings.compileafter = configuration.get<boolean>('import.compileafter', true);
   extensionImportSettings.fromhash = configuration.get<string>('import.fromhash', 'HEAD~1');
+  let synchronizeschemachanges: string = configuration.get<string>('import.synchronizeschemachanges', "no");
+  extensionImportSettings.synchronizeschemachanges = SynchronizeSchemaChangesUtil.parse(synchronizeschemachanges);
 
 
   let settings: ExtensionSettings = new ExtensionSettings();
@@ -30,8 +31,6 @@ export function load(): ExtensionSettings {
   settings.id = configuration.get<string>('id', "");
   if (settings.id === "")
     settings.id = settings.databasename;
-  settings.navserverinstance = configuration.get<string>('navserverinstance', "");
-  settings.navservername = configuration.get<string>('navservername', "localhost");
   settings.databaseserver = configuration.get<string>('databaseserver', "localhost");
   settings.silentprogresspreference = configuration.get<boolean>('silentprogresspreference', true);
   settings.focusterminalonaction = configuration.get<boolean>('focusterminalonaction', true);
@@ -48,8 +47,6 @@ export class ExtensionSettings {
   nstpath: string;
   databasename: string;
   databaseserver: string;
-  navserverinstance: string;
-  navservername: string;
   silentprogresspreference: boolean;
   focusterminalonaction: boolean;
   export: ExtensionExportSettings;
@@ -84,6 +81,7 @@ export class ExtensionExportSettings {
 export class ExtensionImportSettings {
   compileafter: boolean;
   fromhash: string;
+  synchronizeschemachanges: SynchronizeSchemaChanges;
 
   constructor() {
 
