@@ -5,6 +5,7 @@ import { existsSync, writeFile, mkdirSync } from 'fs';
 import { ModifiedConfig } from "./enums";
 import { ExtensionSettings } from "./settings";
 import { getExportOptions, getStartOptions, getImportOptions, getCompileOptions } from "./finsqlfunctions";
+import { getModificationScript } from "./objectmodification";
 
 export function relaunchTerminal() {
   RelaunchTerminal();
@@ -34,8 +35,6 @@ function CreateTempFolder() {
   createFolderIfNotExists("temp");
 }
 function createFolderIfNotExists(foldername: string) {
-  if (existsSync(foldername))
-    return;
   RunPowershellCommand("New-Item", { "ItemType": "Directory", "Path": foldername, "ErrorAction": "Ignore" })
 }
 
@@ -76,34 +75,11 @@ function copyNAVObjectProperties(splitLocation: string) {
   if (!resetDate && resetModified === ModifiedConfig.never)
     return
 
-  RunPowershellCommand("Get-ChildItem", { "Path": splitLocation }, "SplitFiles");
-  let modifiedProp = "";
-  let preSetCommand = [];
-  if (resetModified !== ModifiedConfig.never) {
-    if (resetModified === ModifiedConfig.copy) {
-      preSetCommand.push("$ModifiedStatus = if ($origProps.Modified) {'Yes'} else {'No'}");
-    } else {
-      preSetCommand.push("$ModifiedStatus = 'No'");
-    }
-    modifiedProp = " -ModifiedProperty $ModifiedStatus";
-  }
+  RunPowershellCommand("Get-ChildItem", { "Path": splitLocation }, "ObjectFiles");
+  const loopscript = getModificationScript();
 
-  let datetimeProp = "";
-  if (resetDate) {
-    preSetCommand.push(`$datetimeProp = $origProps.Date,$origProps.Time -join " "`);
-    datetimeProp = " -DateTimeProperty $datetimeProp";
-  }
-  preSetCommand.push(`Set-NAVApplicationObjectProperty -TargetPath $exportedObject${modifiedProp}${datetimeProp}`);
-
-  let objectSetter = preSetCommand.join("\n  ");
-
-  let splitScript = `foreach ($exportedObject in $SplitFiles) {
-$originalObject = Join-Path "src" $exportedObject.Name
-if(Test-Path $originalObject) {
-  $origProps = Get-NAVApplicationObjectProperty -Source $originalObject
-  $newProps = Get-NAVApplicationObjectProperty -Source $exportedObject
-  ${objectSetter}
-  }
+  let splitScript = `foreach ($objectFile in $ObjectFiles) {
+  ${loopscript}
 }`
   RunRawPowershellCommand(splitScript);
 

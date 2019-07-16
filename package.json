@@ -2,7 +2,7 @@
     "name": "finsql-tools",
     "displayName": "Finsql tools",
     "description": "",
-    "version": "0.6.1",
+    "version": "0.6.2",
     "publisher": "jonasandersen",
     "repository": {
         "type": "git",
