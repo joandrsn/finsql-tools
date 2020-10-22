@@ -18,6 +18,7 @@ export function load(): ExtensionSettings {
 
   let extensionImportSettings: ExtensionImportSettings = new ExtensionImportSettings();
   extensionImportSettings.compileafter = configuration.get<boolean>('import.compileafter', true);
+  extensionImportSettings.delete = configuration.get<boolean>('import.compileafter', true);
   extensionImportSettings.fromhash = configuration.get<string>('import.fromhash', 'HEAD~1');
   let synchronizeschemachanges: string = configuration.get<string>('import.synchronizeschemachanges', "no");
   extensionImportSettings.synchronizeschemachanges = SynchronizeSchemaChangesUtil.parse(synchronizeschemachanges);
@@ -82,6 +83,7 @@ export class ExtensionImportSettings {
   compileafter: boolean;
   fromhash: string;
   synchronizeschemachanges: SynchronizeSchemaChanges;
+  delete: boolean;
 
   constructor() {
 

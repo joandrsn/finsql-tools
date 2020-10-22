@@ -2,7 +2,7 @@
     "name": "finsql-tools",
     "displayName": "Finsql tools",
     "description": "",
-    "version": "0.6.2",
+    "version": "0.7.0",
     "publisher": "jonasandersen",
     "repository": {
         "type": "git",
@@ -83,6 +83,11 @@
                         "type": "boolean",
                         "default": true,
                         "description": "Compile nav objects after importing objects."
+                    },
+                    "finsqltools.import.delete": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "Execute deletion commands to the database for deleted objects from the repository."
                     },
                     "finsqltools.import.synchronizeschemachanges": {
                         "type": "string",

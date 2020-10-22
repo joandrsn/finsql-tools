@@ -34,6 +34,7 @@ export function getExportOptions(filter: string, filename: string, settings: Ext
 
   return buildCommandArguments(command, options, settings);
 }
+
 export function getImportOptions(filename: string, settings: ExtensionSettings): string {
   const command = "importobjects";
   let options = getStandardOptions(settings);
@@ -43,6 +44,7 @@ export function getImportOptions(filename: string, settings: ExtensionSettings):
 
   return buildCommandArguments(command, options, settings);
 }
+
 export function getCompileOptions(settings: ExtensionSettings): string {
   const command = "compileobjects";
   let options = getStandardOptions(settings);
@@ -51,6 +53,16 @@ export function getCompileOptions(settings: ExtensionSettings): string {
 
   return buildCommandArguments(command, options, settings);
 }
+
+export function getDeleteOptions(settings: ExtensionSettings): string {
+  const command = "deleteobjects";
+  let options = getStandardOptions(settings);
+  options["filter"] = '$filter'
+  options["synchronizeschemachanges"] = "no"
+
+  return buildCommandArguments(command, options, settings);
+}
+
 export function getStartOptions(settings: ExtensionSettings): string {
   let options = getStandardOptions(settings);
 

@@ -4,7 +4,7 @@ import { join } from 'path';
 import { existsSync, writeFile, mkdirSync } from 'fs';
 import { ModifiedConfig } from "./enums";
 import { ExtensionSettings } from "./settings";
-import { getExportOptions, getStartOptions, getImportOptions, getCompileOptions } from "./finsqlfunctions";
+import { getExportOptions, getStartOptions, getImportOptions, getCompileOptions, getDeleteOptions } from "./finsqlfunctions";
 import { getModificationScript } from "./objectmodification";
 
 export function relaunchTerminal() {
@@ -90,6 +90,19 @@ function importObjects(from: string, to: string) {
   CreateTempFolder();
   let settings = getCurrentSettings();
   let compileafter: boolean = settings.import.compileafter;
+  let shoulddelete: boolean = settings.import.delete;
+  if(shoulddelete) {
+    RunPowershellCommand("Invoke-Expression", { "Command": `git diff ${from}..${to} --name-only --diff-filter D src/` }, "DeletedFiles")
+    let idecommand: string = getDeleteOptions(settings).replace(/"/gi, '`"')
+    let deleteScript = 
+    `foreach($DeletedFile in $DeletedFiles) {
+  $type = switch($DeletedFile.Substring(4,3).ToUpper()){"PAG"{"Page"}"TAB"{"Table"}"XML"{"XMLPort"}"COD"{"Codeunit"}"REP"{"Report"}"QUE"{"Query"}"MEN"{"MenuSuite"}}
+  $id = $DeletedFile.Substring(7) -replace "\\D+",""
+  $filter = "Type=$type;ID=$id"
+  Invoke-NAVIdeCommand -NAVIde $navide -Command "${idecommand}"
+}`;
+    RunRawPowershellCommand(deleteScript);
+  }
   RunPowershellCommand("Invoke-Expression", { "Command": `git diff ${from}..${to} --name-only --diff-filter d src/` }, "ImportFiles")
   let importfile = "./temp/import.txt";
   RunPowershellCommand("New-Object", { "TypeName": "System.IO.FileStream", "ArgumentList": [importfile, 'Create', 'ReadWrite'] }, "StreamWriter");
