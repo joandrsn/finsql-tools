@@ -2,7 +2,7 @@
     "name": "finsql-tools",
     "displayName": "Finsql tools",
     "description": "",
-    "version": "0.7.0",
+    "version": "0.7.1",
     "publisher": "jonasandersen",
     "repository": {
         "type": "git",
@@ -171,5 +171,8 @@
         "vscode": "^1.1.34",
         "@types/node": "^12.0.4",
         "@types/mocha": "^5.2.7"
+    },
+    "dependencies": {
+        "semver": "^7.3.2"
     }
 }

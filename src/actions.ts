@@ -92,7 +92,7 @@ function importObjects(from: string, to: string) {
   let compileafter: boolean = settings.import.compileafter;
   let shoulddelete: boolean = settings.import.delete;
   if(shoulddelete) {
-    RunPowershellCommand("Invoke-Expression", { "Command": `git diff ${from}..${to} --name-only --diff-filter D src/` }, "DeletedFiles")
+    RunPowershellCommand("Invoke-Expression", { "Command": `git diff --no-renames --name-only --diff-filter D ${from}..${to} -- src/` }, "DeletedFiles")
     let idecommand: string = getDeleteOptions(settings).replace(/"/gi, '`"')
     let deleteScript = 
     `foreach($DeletedFile in $DeletedFiles) {
@@ -103,7 +103,7 @@ function importObjects(from: string, to: string) {
 }`;
     RunRawPowershellCommand(deleteScript);
   }
-  RunPowershellCommand("Invoke-Expression", { "Command": `git diff ${from}..${to} --name-only --diff-filter d src/` }, "ImportFiles")
+  RunPowershellCommand("Invoke-Expression", { "Command": `git diff --no-renames --name-only --diff-filter d ${from}..${to} -- src/` }, "ImportFiles")
   let importfile = "./temp/import.txt";
   RunPowershellCommand("New-Object", { "TypeName": "System.IO.FileStream", "ArgumentList": [importfile, 'Create', 'ReadWrite'] }, "StreamWriter");
 
