@@ -1,4 +1,4 @@
-# Finsql Tools
+# FinSQL Tools
 
 A tool for semi-automating source control for Dynamics NAV FinSQL. The problem for source control in Dynamics NAV is that the repository and database has to syncronise the objects. This extension should help to do this syncronisation by doing a lot of work in PowerShell.
 

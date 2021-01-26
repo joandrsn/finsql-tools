@@ -1,7 +1,7 @@
 {
     "name": "finsql-tools",
-    "displayName": "Finsql tools",
-    "description": "",
+    "displayName": "FinSQL Tools",
+    "description": "Semi-automating source control for Dynamics NAV",
     "version": "0.7.1",
     "publisher": "jonasandersen",
     "repository": {
